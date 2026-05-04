@@ -13,7 +13,7 @@ MAGI システムは、第3新東京市の NERV 本部において、組織が�
 - **LAN 公開機能**: Wi-Fi 内のデバイスから直接アクセスし、手元のタブレットを「合議用コンソール」として運用可能。
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TomaszRewak/MAGI/master/examples/example_1.gif" width=800/>
+  <img src="examples/example_1.gif" width=800/>
 </p>
 
 ## システム構成と合議プロセス

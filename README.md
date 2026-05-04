@@ -10,11 +10,11 @@ Originally designed by Dr. Naoko Akagi, each of the three AI agents reflects a s
 Those (often conflicting, yet complementary) agents participate in a voting process in order to answer most challenging questions. 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TomaszRewak/MAGI/master/examples/example_1.gif" width=800/>
+  <img src="examples/example_1.gif" width=800/>
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TomaszRewak/MAGI/master/examples/example_2.gif" width=800/>
+  <img src="examples/example_2.gif" width=800/>
 </p>
 
 ## Implementation
