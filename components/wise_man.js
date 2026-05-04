@@ -31,8 +31,10 @@ export default function WiseMan({ setProps, name, order_number, question_id, ans
 
     let outerClassName = `wise-man ${name}`;
     let innerClassName = 'inner';
-    if (processing)
+    if (processing) {
         innerClassName += ' flicker';
+        outerClassName += ' thinking';
+    }
 
     return $('div', { className: outerClassName, onClick: onClick, key: name },
         $('div', { className: innerClassName, style: { background: color } }, fullName)

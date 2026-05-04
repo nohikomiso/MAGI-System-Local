@@ -167,6 +167,38 @@ body {
     justify-content: center;
 }
 
+/* 思考中（合議中）の演出強化 */
+.wise-man.thinking .inner {
+    position: relative;
+    overflow: hidden;
+}
+
+.wise-man.thinking .inner::before {
+    /* 横方向にも高密度に配置 */
+    content: "8F 02 A1 44 3C 9B 10 FF 00 2D 88 5E EA 31 0C 77\A 99 FF 21 00 B4 88 12 AC 77 00 FF 11 22 33 44 55\A 66 77 88 99 AA BB CC DD EE FF 00 11 8F 02 A1 44\A 3C 9B 10 FF 00 2D 88 5E EA 31 0C 77 99 FF 21 00\A B4 88 12 AC 77 00 FF 11 22 33 44 55 66 77 88 99\A AA BB CC DD EE FF 00 11 8F 02 A1 44 3C 9B 10 FF\A 8F 02 A1 44 3C 9B 10 FF 00 2D 88 5E EA 31 0C 77\A 99 FF 21 00 B4 88 12 AC 77 00 FF 11 22 33 44 55\A 66 77 88 99 AA BB CC DD EE FF 00 11 8F 02 A1 44\A 3C 9B 10 FF 00 2D 88 5E EA 31 0C 77 99 FF 21 00\A B4 88 12 AC 77 00 FF 11 22 33 44 55 66 77 88 99\A AA BB CC DD EE FF 00 11 8F 02 A1 44 3C 9B 10 FF";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 250%; /* さらに横幅を確保 */
+    height: 400%; /* さらに縦ループを長く */
+    font-size: 5cqh; /* 2倍以上にアップ */
+    font-family: 'Lucida Console', Monaco, monospace;
+    color: rgba(255, 255, 255, 0.25);
+    white-space: pre;
+    line-height: 1.0;
+    z-index: 0;
+    pointer-events: none;
+    transform-origin: top left;
+    animation: scroll-logs 1.2s linear infinite; /* 少し速めて躍動感を出す */
+    opacity: 0.7;
+    letter-spacing: 2px;
+}
+
+@keyframes scroll-logs {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+
 .magi>.wise-man.melchior {
     grid-area: melchior-start / melchior-start / melchior-end / melchior-end;
 }

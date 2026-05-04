@@ -59,9 +59,9 @@ app.layout = Div(
                 dcc.Input(id='query', type='text', value='', debounce=True, autoComplete='off'),
             ]),
         ]),
-        Modal(id={'type': 'modal', 'name': 'melchior'}, name='melchior'),
-        Modal(id={'type': 'modal', 'name': 'balthasar'}, name='balthasar'),
-        Modal(id={'type': 'modal', 'name': 'casper'}, name='casper'),
+        Modal(id={'type': 'modal', 'name': 'melchior'}, name='melchior', is_open=False, question={'id': 0, 'query': ''}, answer={'id': 0, 'status': 'info', 'response': 'Waiting...'}),
+        Modal(id={'type': 'modal', 'name': 'balthasar'}, name='balthasar', is_open=False, question={'id': 0, 'query': ''}, answer={'id': 0, 'status': 'info', 'response': 'Waiting...'}),
+        Modal(id={'type': 'modal', 'name': 'casper'}, name='casper', is_open=False, question={'id': 0, 'query': ''}, answer={'id': 0, 'status': 'info', 'response': 'Waiting...'}),
 
         dcc.Store(id='question', data={'id': 0, 'query': ''}),
         dcc.Store(id='annotated-question', data={'id': 0, 'query': '', 'is_yes_or_no_question': False}),
