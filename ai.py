@@ -88,3 +88,28 @@ def classify_answer(question: str, personality: str, answer: str):
         return {'status': 'no', 'conditions': None}
 
     return {'status': 'conditional', 'conditions': content}
+
+
+def summarize_consensus(question: str, answers: dict):
+    """
+    Summarize the overall consensus based on the answers from the three Magi.
+    """
+    consensus_prompt = (
+        f"The user asked: \"{question}\"\n\n"
+        f"Melchior answered: \"{answers.get('melchior', 'No response')}\"\n"
+        f"Balthasar answered: \"{answers.get('balthasar', 'No response')}\"\n"
+        f"Casper answered: \"{answers.get('casper', 'No response')}\"\n\n"
+        "As the central consensus logic of MAGI, provide a definitive summary of the final conclusion. "
+        "The summary must be structured for legibility: use line breaks and bullet points if necessary. "
+        "Maintain an authoritative, clinical tone (in Japanese)."
+    )
+
+    response = client.chat.completions.create(
+        model=LOCAL_MODEL_NAME,
+        messages=[
+            {'role': 'system', 'content': 'You are the central consensus unit of the MAGI supercomputer system.'},
+            {'role': 'user', 'content': consensus_prompt},
+        ]
+    )
+
+    return response.choices[0].message.content
