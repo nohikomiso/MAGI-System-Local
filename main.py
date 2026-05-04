@@ -16,7 +16,14 @@ from dash.html import Div, Label, Span, Button
 from dash_local_react_components import load_react_component
 import ai
 
-app = Dash(__name__)
+app = Dash(
+    __name__,
+    meta_tags=[
+        {"name": "viewport", "content": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"},
+        {"name": "apple-mobile-web-app-capable", "content": "yes"},
+        {"name": "apple-mobile-web-app-status-bar-style", "content": "black-translucent"}
+    ]
+)
 
 Magi = load_react_component(app, 'components', 'magi.js')
 WiseMan = load_react_component(app, 'components', 'wise_man.js')
@@ -267,4 +274,14 @@ def modal_content(question: dict, answer: dict):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    # --- サーバー起動設定 ---
+    # 同一ネットワーク内のデバイス（iPad等）からアクセス可能にするため host='0.0.0.0' を指定しています。
+
+    # 1. 運用・展示用 (デバッグOFF, 右下のアイコンも自動で非表示)
+    # app.run_server(debug=False, host='0.0.0.0', port=8050)
+
+    # 2. 開発用 (デバッグON, エラー詳細表示)
+    # app.run_server(debug=True, host='0.0.0.0', port=8050)
+
+    # 3. ハイブリッド (デバッグONだが、右下の青いアイコンのみ非表示)
+    app.run_server(debug=True, host='0.0.0.0', port=8050, dev_tools_ui=False)

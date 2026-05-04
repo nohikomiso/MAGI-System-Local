@@ -1,21 +1,25 @@
 html {
+    font-size: 16px; /* Base for 1rem */
     background: repeating-linear-gradient(45deg, rgb(0 0 0) 0px, rgb(0 0 0) 20px, #140b02 20px, #140b02 40px);
     min-height: 100vh;
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling on iOS orientation change */
 }
 
 body {
-    margin: 15px;
+    margin: 0.9375rem;
+    -webkit-tap-highlight-color: transparent; /* Remove gray highlight on touch */
 }
 
 .system {
     background: black;
-    border: 2px solid #ff8d00;
-    padding: 15px;
-    max-width: 1200px;
+    border: 0.125rem solid #ff8d00;
+    padding: 0.9375rem;
+    max-width: 95vw; /* Scale with viewport on tablet */
+    width: 75rem;   /* Default target */
     display: flex;
     flex-direction: column;
     position: relative;
-    margin: 0 auto;
+    margin: 0.625rem auto;
 }
 
 .magi {
@@ -76,7 +80,7 @@ body {
         20px;
     aspect-ratio: 2 / 1;
     container-type: size;
-    border: 2px solid #ff8d00;
+    border: 0.125rem solid #ff8d00;
 }
 
 .magi>.title {
@@ -137,8 +141,8 @@ body {
     grid-area: response;
     justify-self: flex-end;
     align-self: center;
-    border: solid 2px;
-    padding: 2px;
+    border: solid 0.125rem;
+    padding: 0.125rem;
 }
 
 .magi>.response>.inner {
@@ -152,8 +156,9 @@ body {
 .magi>.wise-man {
     display: flex;
     background: #ff8d00;
-    padding: 2px;
+    padding: 0.125rem;
     cursor: pointer;
+    touch-action: manipulation; /* Faster taps on mobile */
 }
 
 .magi>.wise-man>.inner {
@@ -242,7 +247,7 @@ body {
 
 
 .connection {
-    height: 10px;
+    height: 0.625rem;
     background: #ff8d00;
     align-self: center;
     margin: -10%;
@@ -263,15 +268,17 @@ body {
 }
 
 .modal {
-    border: 2px solid #ff8d00;
+    border: 0.125rem solid #ff8d00;
     color: #ff8d00;
-    font-family: 'Helvetica';
-    font-family: 'Lucida Console';
+    font-family: 'Lucida Console', Monaco, monospace;
     position: absolute;
     background: black;
-    max-width: 60%;
-    top: 10%;
-    right: 10%;
+    width: 80%; /* Wider on tablet */
+    max-width: 50rem;
+    top: 5rem;
+    right: 5rem;
+    z-index: 2000;
+    box-shadow: 0 0 2rem rgba(0,0,0,0.8);
 }
 
 .modal>.modal-header {
@@ -287,9 +294,11 @@ body {
 }
 
 .modal>.modal-header>.close {
-    padding: 5px;
-    border-left: 2px solid #ff8d00;
+    padding: 0.625rem 1.25rem; /* Larger touch target */
+    border-left: 0.125rem solid #ff8d00;
     cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 .modal>.modal-body {
@@ -301,8 +310,8 @@ body {
 
 /* --- Expanded Input Section Styles --- */
 .input-section {
-    margin-top: 30px;
-    border: 4px double #ff8d00;
+    margin-top: 1.875rem;
+    border: 0.25rem double #ff8d00;
     background: rgba(20, 11, 2, 0.9);
     padding: 0;
     position: relative;
@@ -313,9 +322,9 @@ body {
     color: black;
     font-family: 'Lucida Console', Monaco, monospace;
     font-weight: bold;
-    font-size: 18px;
-    padding: 5px 15px;
-    letter-spacing: 2px;
+    font-size: 1.125rem;
+    padding: 0.3125rem 0.9375rem;
+    letter-spacing: 0.125rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -340,13 +349,24 @@ body {
 
 .input-container {
     display: grid;
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 12.5rem 1fr;
     color: #ff8d00;
     font-family: 'Helvetica', 'Arial', sans-serif;
-    column-gap: 20px;
-    row-gap: 15px;
-    padding: 25px;
+    column-gap: 1.25rem;
+    row-gap: 0.9375rem;
+    padding: 1.5625rem;
     align-items: center;
+}
+
+@media (max-width: 1024px) {
+    .input-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    .input-container > label {
+        text-align: left !important;
+        font-size: 1.2rem !important;
+    }
 }
 
 .input-container > label {
@@ -358,15 +378,15 @@ body {
 
 .input-container > input {
     background: #000000;
-    border: 2px solid #ff8d00;
+    border: 0.125rem solid #ff8d00;
     color: #ff8d00;
-    font-size: 48px;
+    font-size: clamp(1.5rem, 4vw, 3rem);
     font-family: 'Lucida Console', Monaco, monospace;
     font-weight: bold;
-    padding: 10px 20px;
+    padding: 0.625rem 1.25rem;
     width: 100%;
     outline: none;
-    box-shadow: inset 0 0 15px rgba(255, 141, 0, 0.2);
+    box-shadow: inset 0 0 0.9375rem rgba(255, 141, 0, 0.2);
 }
 
 .input-container > input:focus {
@@ -399,9 +419,9 @@ body {
 .verdict-text {
     font-family: 'Helvetica', 'Arial', sans-serif;
     font-weight: 900;
-    font-size: 160px;
-    letter-spacing: 20px;
-    margin-bottom: 30px;
+    font-size: clamp(4rem, 15vw, 10rem);
+    letter-spacing: 1.25rem;
+    margin-bottom: 1.875rem;
     animation: verdict-glitch 0.2s infinite;
 }
 
