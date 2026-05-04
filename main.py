@@ -1,4 +1,15 @@
 import os
+import sys
+import pkgutil
+
+# Python 3.14+ compatibility bridge
+if not hasattr(pkgutil, "find_loader"):
+    from importlib.util import find_spec
+    def find_loader(name):
+        spec = find_spec(name)
+        return spec.loader if spec else None
+    pkgutil.find_loader = find_loader
+
 from dash_extensions.enrich import Dash, Input, Output, State, Trigger, callback, ALL, MATCH
 from dash import dcc
 from dash.html import Div, Label

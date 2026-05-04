@@ -1,0 +1,24 @@
+Python 3.14 対応および OpenAI v2 SDK への大規模オーバーホール
+
+【主な変更内容】
+1. Python 3.14 への完全対応
+   - Python 3.14 で削除された `pkgutil.find_loader` を `importlib.util.find_spec` で代用する互換アダプター（モンキーパッチ）を `main.py` に実装。
+   - これにより、最新の Python 環境でも Dash のデバッグモード (`debug=True`) を含め正常に動作することを確認済み。
+
+2. デザイン維持（Design Maintenance）ルートの採用
+   - 最新の `dash-mantine-components` (v2.x) への移行によるデザイン崩れを避けるため、意図的に `dmc==0.12.1` および `dash==2.9.3` を固定。
+   - 古いライブラリに起因する `pkg_resources` の欠落を補うため、`setuptools<70` を導入。
+
+3. AI エンジンの最新化 (OpenAI SDK v2 対応)
+   - `openai` SDK を v2.33.0 にアップデートし、`ai.py` を完全にリライト。
+   - `openai.ChatCompletion.create` などの旧式 API を廃止し、`client.chat.completions.create` を使用するモダンなクライアントベースのコードへ移行。
+   - `logit_bias` の指定方法を最新 SDK の仕様（キーを文字列化）に適合。
+
+4. 環境管理の現代化 (uv)
+   - `uv init` による `pyproject.toml` 管理を導入し、`uv sync` による爆速かつ正確な環境構築を可能に。
+   - 実行パスに拠らない安定性を確保するため、仮想環境内の Python インタープリタを直接使用する運用を推奨。
+
+【検証内容】
+- Python 3.14.2 環境下での起動を確認。
+- オリジナルのエヴァンゲリオン風デザイン（オレンジと漆黒）が維持されていることを確認。
+- ローカル Llama サーバー（Gemma）との正常な連携を確認。

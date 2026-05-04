@@ -1,24 +1,23 @@
-import openai
+from openai import OpenAI
 import re
 
 # --- Local Llama Server Configuration ---
 LOCAL_SERVER_URL = "http://192.168.0.152:8080/v1"
 LOCAL_MODEL_NAME = "gemma-4-26B-A4B-it-ultra-uncensored-heretic-Q5_K_M.gguf"
 
-openai.api_base = LOCAL_SERVER_URL
-openai.api_key = "not-needed" # Dummy key
+# Initialize the OpenAI client for the local server
+client = OpenAI(base_url=LOCAL_SERVER_URL, api_key="not-needed")
 # ----------------------------------------
 
 
 def is_yes_or_no_question(question: str, key: str):
-    # openai.api_key = key  # Removed to prioritize local server
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=LOCAL_MODEL_NAME,
         logit_bias={
-            10784: 100, # "Yes"
-            11262: 100, # " yes"
-            3771: 100,  # "No"
-            951: 100    # " no"
+            "10784": 100, # "Yes"
+            "11262": 100, # " yes"
+            "3771": 100,  # "No"
+            "951": 100    # " no"
         },
         max_tokens=1,
         messages=[
@@ -34,7 +33,7 @@ def is_yes_or_no_question(question: str, key: str):
         ]
     )
 
-    content = response['choices'][0]['message']['content'].strip()
+    content = response.choices[0].message.content.strip()
 
     if re.match('^yes$', content, re.IGNORECASE):
         return True
@@ -58,8 +57,7 @@ def get_system_prompt(personality: str):
 
 
 def get_answer(question: str, personality: str, key: str):
-    # openai.api_key = key  # Removed to prioritize local server
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=LOCAL_MODEL_NAME,
         messages=[
             {'role': 'system', 'content': get_system_prompt(personality)},
@@ -67,12 +65,11 @@ def get_answer(question: str, personality: str, key: str):
         ]
     )
 
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 
 def classify_answer(question: str, personality: str, answer: str, key: str):
-    # openai.api_key = key  # Removed to prioritize local server
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=LOCAL_MODEL_NAME,
         messages=[
             {'role': 'system', 'content': get_system_prompt(personality)},
@@ -82,7 +79,7 @@ def classify_answer(question: str, personality: str, answer: str, key: str):
         ]
     )
 
-    content = response['choices'][0]['message']['content'].strip()
+    content = response.choices[0].message.content.strip()
 
     if re.match('^yes$', content, re.IGNORECASE):
         return {'status': 'yes', 'conditions': None}

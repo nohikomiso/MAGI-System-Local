@@ -53,26 +53,22 @@ cd MAGI
 
 2. Python 仮想環境を作成し、依存関係をインストールする：
 
+このリポジトリは `uv` を使用したプロジェクト管理に対応しています。以下のコマンドで Python 3.14 環境と最新の依存関係（OpenAI v2 等）をセットアップできます。
+
 ```bash
-uv venv --python 3.10
-uv pip install -r requirements.txt
-# 重要: Dash 2.9.3 の動作に必要な pkg_resources を確保するため、古い setuptools をインストールします
-uv pip install "setuptools<70"
+uv venv --python 3.14
+uv sync
 ```
 
-3. アプリケーションを起動する（以下のいずれかの方法）：
+3. アプリケーションを起動する：
 
-**方法 A: `uv run` を使用する（推奨）**
-仮想環境を明示的に有効化（activate）することなく、ワンコマンドで起動できます。
-```bash
-uv run main.py
-```
+親ディレクトリに別の `pyproject.toml` 等が存在する場合、`uv run` コマンドがそちらを優先して参照してしまい、ライブラリ不足のエラー（ModuleNotFoundError）が出ることがあります。そのため、以下の**仮想環境内の Python を直接指定して実行する方法が最も確実**です。
 
-**方法 B: 仮想環境の Python を直接使用する**
-作成された `.venv` 内の Python を直接指定して実行します。
 ```bash
 .venv/bin/python main.py
 ```
+
+（※環境が衝突しないクリーンなディレクトリであれば `uv run main.py` も使用可能です）
 
 4. Web ブラウザで http://127.0.0.1:8050/ にアクセスします。
 
