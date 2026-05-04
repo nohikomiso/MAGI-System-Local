@@ -1,14 +1,24 @@
 import openai
 import re
 
+# --- Local Llama Server Configuration ---
+LOCAL_SERVER_URL = "http://192.168.0.152:8080/v1"
+LOCAL_MODEL_NAME = "gemma-4-26B-A4B-it-ultra-uncensored-heretic-Q5_K_M.gguf"
+
+openai.api_base = LOCAL_SERVER_URL
+openai.api_key = "not-needed" # Dummy key
+# ----------------------------------------
+
 
 def is_yes_or_no_question(question: str, key: str):
-    openai.api_key = key
+    # openai.api_key = key  # Removed to prioritize local server
     response = openai.ChatCompletion.create(
-        model='gpt-4',
+        model=LOCAL_MODEL_NAME,
         logit_bias={
-            9642: 100,  # Yes
-            2822: 100  # No
+            10784: 100, # "Yes"
+            11262: 100, # " yes"
+            3771: 100,  # "No"
+            951: 100    # " no"
         },
         max_tokens=1,
         messages=[
@@ -24,12 +34,12 @@ def is_yes_or_no_question(question: str, key: str):
         ]
     )
 
-    content = response['choices'][0]['message']['content']
+    content = response['choices'][0]['message']['content'].strip()
 
-    if content == 'Yes':
+    if re.match('^yes$', content, re.IGNORECASE):
         return True
 
-    if content == 'No':
+    if re.match('^no$', content, re.IGNORECASE):
         return False
 
     raise Exception(f'Invalid question annotation response: {content}')
@@ -48,9 +58,9 @@ def get_system_prompt(personality: str):
 
 
 def get_answer(question: str, personality: str, key: str):
-    openai.api_key = key
+    # openai.api_key = key  # Removed to prioritize local server
     response = openai.ChatCompletion.create(
-        model='gpt-4',
+        model=LOCAL_MODEL_NAME,
         messages=[
             {'role': 'system', 'content': get_system_prompt(personality)},
             {'role': 'user', 'content': question},
@@ -61,9 +71,9 @@ def get_answer(question: str, personality: str, key: str):
 
 
 def classify_answer(question: str, personality: str, answer: str, key: str):
-    openai.api_key = key
+    # openai.api_key = key  # Removed to prioritize local server
     response = openai.ChatCompletion.create(
-        model='gpt-4',
+        model=LOCAL_MODEL_NAME,
         messages=[
             {'role': 'system', 'content': get_system_prompt(personality)},
             {'role': 'user', 'content': question},
@@ -72,12 +82,12 @@ def classify_answer(question: str, personality: str, answer: str, key: str):
         ]
     )
 
-    content = response['choices'][0]['message']['content']
+    content = response['choices'][0]['message']['content'].strip()
 
-    if re.match('^\W*yes\W*$', content, re.IGNORECASE):
+    if re.match('^yes$', content, re.IGNORECASE):
         return {'status': 'yes', 'conditions': None}
 
-    if re.match('^\W*no\W*$', content, re.IGNORECASE):
+    if re.match('^no$', content, re.IGNORECASE):
         return {'status': 'no', 'conditions': None}
 
     return {'status': 'conditional', 'conditions': content}
