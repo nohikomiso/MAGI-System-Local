@@ -10,7 +10,7 @@ client = OpenAI(base_url=LOCAL_SERVER_URL, api_key="not-needed")
 # ----------------------------------------
 
 
-def is_yes_or_no_question(question: str, key: str):
+def is_yes_or_no_question(question: str):
     response = client.chat.completions.create(
         model=LOCAL_MODEL_NAME,
         logit_bias={
@@ -56,7 +56,7 @@ def get_system_prompt(personality: str):
     return '\n'.join(system_messages)
 
 
-def get_answer(question: str, personality: str, key: str):
+def get_answer(question: str, personality: str):
     response = client.chat.completions.create(
         model=LOCAL_MODEL_NAME,
         messages=[
@@ -68,7 +68,7 @@ def get_answer(question: str, personality: str, key: str):
     return response.choices[0].message.content
 
 
-def classify_answer(question: str, personality: str, answer: str, key: str):
+def classify_answer(question: str, personality: str, answer: str):
     response = client.chat.completions.create(
         model=LOCAL_MODEL_NAME,
         messages=[

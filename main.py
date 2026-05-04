@@ -49,11 +49,12 @@ app.layout = Div(
                 personality='You are a woman. Your goal is to pursue love, dreams and desires.'),
             Response(id='response', status='info')
         ]),
-        Div(className='input-container', children=[
-            Label('access code: '),
-            dcc.Input(id='key', autoComplete='off', type='password', value=os.getenv('OPENAI_API_KEY', '')),
-            Label('question: '),
-            dcc.Input(id='query', type='text', value='', debounce=True, autoComplete='off'),
+        Div(className='input-section', children=[
+            Div('SYSTEM COMMAND / QUERY ENTRY', className='input-header'),
+            Div(className='input-container', children=[
+                Label('QUESTION:'),
+                dcc.Input(id='query', type='text', value='', debounce=True, autoComplete='off'),
+            ]),
         ]),
         Modal(id={'type': 'modal', 'name': 'melchior'}, name='melchior'),
         Modal(id={'type': 'modal', 'name': 'balthasar'}, name='balthasar'),
@@ -78,11 +79,10 @@ def question(query: str, question: dict):
 @callback(
     Output('annotated-question', 'data'),
     Input('question', 'data'),
-    State('key', 'value'),
     prevent_initial_call=True)
-def annotated_question(question: dict, key: str):
+def annotated_question(question: dict):
     try:
-        is_yes_or_no_question = ai.is_yes_or_no_question(question['query'], key)
+        is_yes_or_no_question = ai.is_yes_or_no_question(question['query'])
 
         return {
             'id': question['id'],
@@ -114,17 +114,16 @@ def extention(question: dict, annotated_question: dict):
     Output({'type': 'wise-man', 'name': MATCH}, 'answer'),
     Input('annotated-question', 'data'),
     State({'type': 'wise-man', 'name': MATCH}, 'personality'),
-    State('key', 'value'),
     prevent_initial_call=True)
-def wise_man_answer(question: dict, personality: str, key: str):
+def wise_man_answer(question: dict, personality: str):
     if question['error']:
         return {'id': question['id'], 'response': question['error'], 'status': 'error'}
 
     try:
-        answer = ai.get_answer(question['query'], personality, key)
+        answer = ai.get_answer(question['query'], personality)
 
         if question['is_yes_or_no_question']:
-            classification = ai.classify_answer(question['query'], personality, answer, key)
+            classification = ai.classify_answer(question['query'], personality, answer)
         else:
             classification = {'status': 'info', 'conditions': None}
 
