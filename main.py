@@ -105,6 +105,8 @@ def annotated_question(question: dict):
             'error': None
         }
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return {
             'id': question['id'],
             'query': question['query'],

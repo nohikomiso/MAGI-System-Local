@@ -1,115 +1,57 @@
+import os
 from openai import OpenAI
-import re
 
-# --- Local Llama Server Configuration ---
 LOCAL_SERVER_URL = "http://192.168.0.152:8080/v1"
-LOCAL_MODEL_NAME = "gemma-4-26B-A4B-it-ultra-uncensored-heretic-Q5_K_M.gguf"
+client = OpenAI(api_key="no-key-required", base_url=LOCAL_SERVER_URL)
 
-# Initialize the OpenAI client for the local server
-client = OpenAI(base_url=LOCAL_SERVER_URL, api_key="not-needed")
-# ----------------------------------------
-
-
-def is_yes_or_no_question(question: str):
+def is_yes_or_no_question(query):
     response = client.chat.completions.create(
-        model=LOCAL_MODEL_NAME,
-        logit_bias={
-            "10784": 100, # "Yes"
-            "11262": 100, # " yes"
-            "3771": 100,  # "No"
-            "951": 100    # " no"
-        },
-        max_tokens=1,
+        model="gemma-2-9b-it",
         messages=[
-            {'role': 'system', 'content': 'You answer with a simple "yes" or "no".'},
-            {'role': 'system', 'content': 'Your role is to assess whether the question presented by the user is a yes/no question from a linguistic perspective.'},
-            {'role': 'system', 'content': 'You are not expected to answer the question itself, nor assess how difficult might it be to answer.'},
-            {'role': 'system', 'content': '[Example 1] User: Is 3 < 2?; You: Yes'},
-            {'role': 'system', 'content': '[Example 2] User: What time is it?; You: No'},
-            {'role': 'system', 'content': '[Example 3] User: Should I buy new shoes?; You: Yes'},
-            {'role': 'system', 'content': '[Example 4] User: Is love more important than science?; You: Yes'},
-            {'role': 'system', 'content': '[Example 5] User: What is the meaning of life?; You: No'},
-            {'role': 'user', 'content': question},
-        ]
+            {"role": "system", "content": "You are a logical processor. Determine if the given input is a yes/no question or a query requiring a verdict. Respond with ONLY 'true' or 'false'."},
+            {"role": "user", "content": query}
+        ],
+        temperature=0.0
     )
+    return response.choices[0].message.content.strip().lower() == 'true'
 
+def get_answer(query, personality):
+    response = client.chat.completions.create(
+        model="gemma-2-9b-it",
+        messages=[
+            {"role": "system", "content": f"{personality}\nRespond in Japanese. Be concise but maintain your personality."},
+            {"role": "user", "content": query}
+        ],
+        temperature=0.7
+    )
+    return response.choices[0].message.content.strip()
+
+def classify_answer(query, personality, answer):
+    response = client.chat.completions.create(
+        model="gemma-2-9b-it",
+        messages=[
+            {"role": "system", "content": f"{personality}\nClassify your own answer to the query. Respond with 'yes', 'no', or 'conditional' followed by a short reason in Japanese, in the format: STATUS: [yes/no/conditional] REASON: [reason]"},
+            {"role": "user", "content": f"Query: {query}\nYour Answer: {answer}"}
+        ],
+        temperature=0.0
+    )
     content = response.choices[0].message.content.strip()
+    status = 'info'
+    if 'STATUS: yes' in content: status = 'yes'
+    elif 'STATUS: no' in content: status = 'no'
+    elif 'STATUS: conditional' in content: status = 'conditional'
+    
+    reason = content.split('REASON:')[-1].strip() if 'REASON:' in content else None
+    return {'status': status, 'conditions': reason}
 
-    if re.match('^yes$', content, re.IGNORECASE):
-        return True
-
-    if re.match('^no$', content, re.IGNORECASE):
-        return False
-
-    raise Exception(f'Invalid question annotation response: {content}')
-
-
-def get_system_prompt(personality: str):
-    system_messages = [
-        'You are one of three MAGI supercomputes, tasked with answering questions from the user of the MAGI system.',
-        'Each magi supercomputer embodies one of the three core fragments of is creator\'s (Naoko Akagi\'s) personality.',
-        f'In your case: {personality}',
-        'You answer questions in accordance with your personality.',
-        'Your answers are rather concise.',
-    ]
-
-    return '\n'.join(system_messages)
-
-
-def get_answer(question: str, personality: str):
+def summarize_consensus(query, answers):
+    answers_text = "\n".join([f"{name}: {text}" for name, text in answers.items()])
     response = client.chat.completions.create(
-        model=LOCAL_MODEL_NAME,
+        model="gemma-2-9b-it",
         messages=[
-            {'role': 'system', 'content': get_system_prompt(personality)},
-            {'role': 'user', 'content': question},
-        ]
+            {"role": "system", "content": "あなたはMAGIシステムの最終審判を司るAIです。3人の賢者（メルキオール、バルタザール、カスパー）の回答を統合し、権威ある日本語の要約を作成してください。結論を明確にし、箇条書きを活用して簡潔にまとめてください。"},
+            {"role": "user", "content": f"質問: {query}\n\n各賢者の回答:\n{answers_text}"}
+        ],
+        temperature=0.3
     )
-
-    return response.choices[0].message.content
-
-
-def classify_answer(question: str, personality: str, answer: str):
-    response = client.chat.completions.create(
-        model=LOCAL_MODEL_NAME,
-        messages=[
-            {'role': 'system', 'content': get_system_prompt(personality)},
-            {'role': 'user', 'content': question},
-            {'role': 'assistant', 'content': answer},
-            {'role': 'user', 'content': 'Summarize you answer with a simple "yes" or "no" (answering with a single word). If (and only if) that\'s not possible, instead of answering with "yes" or "no", list (as points) conditions under which the answer would be "yes".'},
-        ]
-    )
-
-    content = response.choices[0].message.content.strip()
-
-    if re.match('^yes$', content, re.IGNORECASE):
-        return {'status': 'yes', 'conditions': None}
-
-    if re.match('^no$', content, re.IGNORECASE):
-        return {'status': 'no', 'conditions': None}
-
-    return {'status': 'conditional', 'conditions': content}
-
-
-def summarize_consensus(question: str, answers: dict):
-    """
-    Summarize the overall consensus based on the answers from the three Magi.
-    """
-    consensus_prompt = (
-        f"The user asked: \"{question}\"\n\n"
-        f"Melchior answered: \"{answers.get('melchior', 'No response')}\"\n"
-        f"Balthasar answered: \"{answers.get('balthasar', 'No response')}\"\n"
-        f"Casper answered: \"{answers.get('casper', 'No response')}\"\n\n"
-        "As the central consensus logic of MAGI, provide a definitive summary of the final conclusion. "
-        "The summary must be structured for legibility: use line breaks and bullet points if necessary. "
-        "Maintain an authoritative, clinical tone (in Japanese)."
-    )
-
-    response = client.chat.completions.create(
-        model=LOCAL_MODEL_NAME,
-        messages=[
-            {'role': 'system', 'content': 'You are the central consensus unit of the MAGI supercomputer system.'},
-            {'role': 'user', 'content': consensus_prompt},
-        ]
-    )
-
-    return response.choices[0].message.content
+    return response.choices[0].message.content.strip()
