@@ -42,17 +42,34 @@ MAGI システムは、第3新東京市の NERV 本部において、組織が�
 
 ### セットアップ手順 (`uv` を使用する場合)
 
-1. **プロジェクトの初期化**:
+1. **リポジトリのクローン**:
+   ```bash
+   git clone https://github.com/nohikomiso/MAGI-System-Local.git
+   cd MAGI-System-Local
+   ```
+
+2. **プロジェクトの初期化**:
    ```bash
    uv venv --python 3.14
    uv sync
    ```
 
-2. **サーバーの起動**:
+3. **サーバーの起動**:
    ```bash
    .venv/bin/python main.py
    ```
    ※ host を `0.0.0.0` に設定しているため、同一ネットワーク内の他デバイスからもアクセス可能です。
+
+### ⚠️ ローカルサーバーの URL・API キー設定に関する注意
+
+現在、推論を行うバックエンド（Llamaserv など）の接続先や API キー（トークン）が `ai.py` 内にハードコードされています。
+環境構築後、サーバーを起動する前に、必ずご自身の推論サーバーの IP アドレス、ポート、および必要に応じて API キーに合わせて、`ai.py` の該当箇所を書き換えてください。
+
+```python
+# ai.py の4行目・5行目付近
+LOCAL_SERVER_URL = "http://192.168.0.152:8080/v1" # ← ご自身の環境のURLに変更してください
+client = OpenAI(api_key="no-key-required", base_url=LOCAL_SERVER_URL) # ← 必要に応じてAPIキー（トークン）を変更してください
+```
 
 ## 運用設定 (main.py)
 
@@ -64,3 +81,8 @@ MAGI システムは、第3新東京市の NERV 本部において、組織が�
 ## iPad / タブレットでの利用
 
 iPad の Safari でアクセス後、**「ホーム画面に追加」** することで、アドレスバーのないフルスクリーンの「MAGI 専用コンソール」として運用可能です。`rem` 単位と `clamp()` 関数により、Retina ディスプレイでも最適な文字密度が保たれます。
+
+## 謝辞 (Acknowledgments)
+
+本プロジェクトは、TomaszRewak 氏による素晴らしいオリジナルプロジェクト [TomaszRewak/MAGI](https://github.com/TomaszRewak/MAGI) をフォークし、近代化改修および日本語環境向けに独自アップデートを加えたものです。
+劇中の MAGI システムをブラウザ上で再現するという卓越したコンセプトと、その基礎となるアーキテクチャを設計された原作者である TomaszRewak 氏に深く感謝いたします。
