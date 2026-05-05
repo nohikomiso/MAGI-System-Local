@@ -1,4 +1,16 @@
 import os
+import sys
+import typing
+
+# Python 3.14 workaround for pydantic < 2.14
+if sys.version_info >= (3, 14):
+    if hasattr(typing, "_eval_type"):
+        original_eval_type = typing._eval_type
+        def patched_eval_type(*args, **kwargs):
+            kwargs.pop("prefer_fwd_module", None)
+            return original_eval_type(*args, **kwargs)
+        typing._eval_type = patched_eval_type
+
 from openai import OpenAI
 
 LOCAL_SERVER_URL = "http://192.168.0.152:8080/v1"
