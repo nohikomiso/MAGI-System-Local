@@ -1,89 +1,66 @@
-# MAGI
+# MAGI (マギ) システム - 近代化改修版 (2026.05)
 
-MAGI system is a cluster of three AI supercomputers that manage and support all task performed by the NERV organization from their Tokyo-3 headquarter.
+MAGI システムは、第3新東京市の NERV 本部において、組織が行うすべての任務を管理・サポートする 3 台の AI 超弩級コンピュータによる集合体です。
 
-Originally designed by Dr. Naoko Akagi, each of the three AI agents reflects a separate part of her complex personality:
-- MELCHIOR • 1 - her as a scientist,
-- BALTHASAR • 2 - her as a mother,
-- CASPER • 3 - her as a woman.
+本リポジトリは、オリジナル版をベースに **Python 3.14 / Dash 2.18.2** 世代へ完全対応させ、並列推論処理と劇中再現度を大幅に強化した近代化改修版です。
 
-Those (often conflicting, yet complementary) agents participate in a voting process in order to answer most challenging questions. 
+## 主要なアップデート項目 (2026.05)
+
+- **マルチスレッド並列推論**: 3人の賢者（エージェント）が同時に思考を開始し、並列で回答を生成する高速アーキテクチャを実装。
+- **高密度計算ログ演出**: 推論中、各エージェントのパネルに劇中を彷彿とさせる高速スクロールの計算ログアニメーションを表示。
+- **AI 最終審議サマリー**: 3人の賢者の回答を AI が統合し、権威ある日本語の要約として提示する最終判定画面を実装。
+- **マルチデバイス最適化 (iPad/Tablet)**: すべての単位を `px` から `rem` へ移行し、iPad（10インチ横向き）などの高解像度・タッチデバイスに最適化。
+- **LAN 公開機能**: Wi-Fi 内のデバイスから直接アクセスし、手元のタブレットを「合議用コンソール」として運用可能。
 
 <p align="center">
   <img src="examples/example_1.gif" width=800/>
 </p>
 
-<p align="center">
-  <img src="examples/example_2.gif" width=800/>
-</p>
+## システム構成と合議プロセス
 
-## Implementation
+赤木ナオコ博士の 3 つの人格を反映したエージェントが、大規模言語モデル（LLM）を通じて合議を行います。
 
-The presented implementation of the MAGI system is powered by the ChatGPT-3.5 large language model. (Upgrading the model to ChatGPT-4 in the future may bring further improvements in its abilities).
+1. **MELCHIOR (メルキオール) • 1**: 科学者としての側面。
+2. **BALTHASAR (バルタザール) • 2**: 母親としての側面。
+3. **CASPER (カスパー) • 3**: 女性としての側面。
 
-The procedure of answering questions is as follows:
-1. The question is classified in order to determine if it can be answered with a "yes"/"no" response.
-2. The question (as is) is presented to each MAGI agent.
-3. If the question was classified as a "yes"/"no" question, each agent is tasked with classifying their respective answers into one of those two categories (and optionally listing additional conditions if the actual answer is too complex).
+### 判定アルゴリズム
+システムは以下の優先順位で最終ステータスを決定します：
+- **error (誤 差)**: エージェントの通信異常
+- **info (情 報)**: 自由回答形式の質問
+- **no (拒 絶)**: 1人でも「いいえ」と回答
+- **conditional (状 態)**: 1人でも「条件付き」で回答
+- **yes (合 意)**: 全員が「はい」で一致
 
-The system can produce following responses (that are evaluated in this order):
-- error (誤 差) - if one or more agents encountered an error
-- info (情 報) - if the question was not classified as a "yes"/"no" question
-- no (拒 絶) - if at least one of the agent answered with a "no"
-- conditional (状 態) - if at least one agent answered with a conditional "yes"
-- yes (合 意) - if all agents answered with an unconditional "yes"
+## 実行環境の構築
 
-Individual agents can be inspected in order to view their full replies and additional conditions.
+### 推奨環境
+- **Python**: 3.14.2 以降 (uv による管理を推奨)
+- **Dash**: 2.18.2 以降
+- **OpenAI SDK**: v2.33.0 以降
+- **バックエンド**: Llamaserv (4並列スロット対応を推奨)
 
-Each subsystem was fine-tuned using following prompts:
-- MELCHIOR • 1 - You are a scientist. Your goal is to further our understanding of the universe and advance our technological progress.
-- BALTHASAR • 2 - You are a mother. Your goal is to protect your children and ensure their well-being.
-- CASPER • 3 - You are a woman. Your goal is to pursue love, dreams and desires.
+### セットアップ手順 (`uv` を使用する場合)
 
-## Usage
+1. **プロジェクトの初期化**:
+   ```bash
+   uv venv --python 3.14
+   uv sync
+   ```
 
-*In order to follow those steps, you need `git` and `python` (version 3) installed on your system. The presented steps should work on the Windows OS (for linux systems the process should be similar, but may differ slightly).*
+2. **サーバーの起動**:
+   ```bash
+   .venv/bin/python main.py
+   ```
+   ※ host を `0.0.0.0` に設定しているため、同一ネットワーク内の他デバイスからもアクセス可能です。
 
-1. Clone the repo:
+## 運用設定 (main.py)
 
-```
-git clone https://github.com/TomaszRewak/MAGI.git
-```
+`main.py` 末尾の `app.run_server` セクションで、用途に合わせてデバッグ表示を切り替えられます。
+- **運用・展示モード**: `debug=False`（アイコンなし、完全な没入感）
+- **開発・診断モード**: `debug=True`（詳細なエラーレポートを有効化）
+- **ハイブリッドモード**: `debug=True, dev_tools_ui=False`（デバッグを有効にしつつ右下のアイコンのみ隠す）
 
-2. Navigate to the cloned directory:
+## iPad / タブレットでの利用
 
-```
-cd MAGI
-```
-
-3. Create python virtual environment:
-
-```
-python -m venv .venv
-```
-
-4. Activate the virtual environment:
-
-```
-.\.venv\scripts\activate
-```
-
-5. Install dependencies:
-
-```
-pip install -r requirements.txt
-```
-
-6. Start the app:
-
-```
-python main.py
-```
-
-7. Navigate to http://127.0.0.1:8050/ in your web browser.
-
-8. Paste your openAI API key into the `access code` field (alternatively you can set the `OPENAI_API_KEY` environment variable before starting the app).
-
-9. Write your question into the `question` field and hit enter.
-
-10. Click on individual subsystems to inspect their answers.
+iPad の Safari でアクセス後、**「ホーム画面に追加」** することで、アドレスバーのないフルスクリーンの「MAGI 専用コンソール」として運用可能です。`rem` 単位と `clamp()` 関数により、Retina ディスプレイでも最適な文字密度が保たれます。
