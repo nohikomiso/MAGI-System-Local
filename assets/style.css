@@ -349,7 +349,7 @@ body {
 
 .input-container {
     display: grid;
-    grid-template-columns: 12.5rem 1fr;
+    grid-template-columns: 1fr;
     color: #ff8d00;
     font-family: 'Helvetica', 'Arial', sans-serif;
     column-gap: 1.25rem;

@@ -62,7 +62,6 @@ app.layout = Div(
                 Button('最終審判を表示', id='reopen-verdict-btn', className='view-verdict-btn', style={'display': 'none'})
             ]),
             Div(className='input-container', children=[
-                Label('QUESTION:'),
                 dcc.Input(id='query', type='text', value='', debounce=True, autoComplete='off'),
             ]),
         ]),
